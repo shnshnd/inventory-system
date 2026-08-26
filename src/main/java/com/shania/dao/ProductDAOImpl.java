@@ -12,8 +12,7 @@ import java.util.List;
 public class ProductDAOImpl implements ProductDAO {
     //IMPROVEMENTS:
     // Proper Error Logging,
-    // Layer per method for checking if product exist
-    //
+
     @Override//Continue: Checking how to handle the display
     public boolean createProduct(Product product) {
         String sql = "INSERT INTO products(name, price, stock_quantity) VALUES(?, ?, ?)";

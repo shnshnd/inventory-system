@@ -28,40 +28,40 @@ public class ProductService {
         return quantity >= 0;
     }
 
-    public Product getExistingProduct(int id) {
+    public Product getExistingProduct(int id) throws SQLException{
         try {
             return dao.getProductById(id);
         }catch(SQLException e){
-            return null;
+            throw new SQLException("Database Error", e);
         }
     }
-    public List<Product> getAllExistingProducts(){
+    public List<Product> getAllExistingProducts() throws SQLException{
         try{
             return dao.getAllProducts();
         } catch(SQLException e){
-            return null;
+            throw new SQLException("Database Error in Getting All Existing Product");
         }
     }
 
-    public boolean createProduct(Product product){
+    public boolean createProduct(Product product) throws SQLException{
         try {
             return dao.createProduct(product);
         } catch (SQLException e) {
-            return false;
+            throw new SQLException("Database Error in Creating the Product");
         }
     }
-    public boolean updateProduct(Product product){
+    public boolean updateProduct(Product product) throws SQLException{
         try{
             return dao.updateProduct(product);
         } catch(SQLException e){
-            return false;
+            throw new SQLException("Database Error in Updating the Product");
         }
     }
-    public boolean deleteProduct(int id){
+    public boolean deleteProduct(int id) throws SQLException{
         try{
             return dao.deleteProduct(id);
         }catch(SQLException e){
-            return false;
+            throw new SQLException("Database Error in Deleting the Product");
         }
     }
 }
