@@ -13,8 +13,8 @@ public class ProductDAOImpl implements ProductDAO {
     //IMPROVEMENTS:
     // Proper Error Logging,
 
-    @Override//Continue: Checking how to handle the display
-    public boolean createProduct(Product product) {
+    @Override
+    public boolean createProduct(Product product) throws SQLException{
         String sql = "INSERT INTO products(name, price, stock_quantity) VALUES(?, ?, ?)";
         try(Connection con = DBConnection.getConnection();
             PreparedStatement pstmt = con.prepareStatement(sql)){
@@ -24,13 +24,13 @@ public class ProductDAOImpl implements ProductDAO {
             int rowsAffected = pstmt.executeUpdate();
             return rowsAffected > 0;
         } catch(SQLException e){
-            e.printStackTrace();
+            throw new SQLException("Error while accessing product data", e);
         }
-        return false;
+//        return false;
     }
 
     @Override
-    public Product getProductById(int id){
+    public Product getProductById(int id) throws SQLException{
         String sql = "SELECT id, name, price, stock_quantity, created_at FROM products WHERE id = ?";//using * instead of specifying the columns is said to be not ideal
         try(Connection con = DBConnection.getConnection();
             PreparedStatement pstmt = con.prepareStatement(sql)){
@@ -51,15 +51,14 @@ public class ProductDAOImpl implements ProductDAO {
                 }
             }
         } catch(SQLException e){
-            e.printStackTrace();
+            throw new SQLException("Error while accessing product data", e);
         }
-        //IMPROVEMENTS: GPT Suggestion - Later (when we add Service layer): 👉 I may ask you to convert to Optional
         return null;//using just null is vulnerable for NullPointerException is what your trying to access turns out null.
     }
 
 
     @Override
-    public List<Product> getAllProducts() {
+    public List<Product> getAllProducts() throws SQLException{
         List<Product> productList = new ArrayList<>();
         String sql = "SELECT id, name, price, stock_quantity, created_at FROM products";
         try(Connection con = DBConnection.getConnection();
@@ -79,19 +78,13 @@ public class ProductDAOImpl implements ProductDAO {
                 productList.add(product);
             }
         } catch(SQLException e){
-            e.printStackTrace();
-            //print stack trace (for now)
-            //IMPROVEMENTS: GPT Suggestion - throw runtime exception (better later)
+            throw new SQLException("Error while accessing product data", e);
         }
-        return productList;//It is better to use productList for better consistency, this will also return an empty list if there's no data helps the NullPointerException
-        //List.of() - This is actually good practice (immutable empty list 👏). But I already created List<Product> productList = new ArrayList<>();
+        return productList;
     }
 
     @Override //REVIEW: ChatGPT suggestions
-    public boolean updateProduct(Product product){
-        //IMPROVEMENT: Validate Input
-        // Ex if product is null → throw IllegalArgumentException
-        //if product.getId() <= 0 → invalid update target //Updating without valid ID is logically wrong.
+    public boolean updateProduct(Product product) throws SQLException {
         String sql = "UPDATE products SET name = ?, price = ?, stock_quantity = ? WHERE id = ?";
         try(Connection con = DBConnection.getConnection();
             PreparedStatement pstmt = con.prepareStatement(sql)) {
@@ -102,19 +95,18 @@ public class ProductDAOImpl implements ProductDAO {
             int rowsAffected = pstmt.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLException e) {
-            e.printStackTrace();//throw new RuntimeException(e);//Learn the different exception/errors and the different use of "throw". WHERE and WHAT are they used
-            return false;//putting the return false inside the catch keeps failures handled together
+            throw new SQLException("Error while accessing product data", e);
+            //e.printStackTrace();//throw new RuntimeException(e);//Learn the different exception/errors and the different use of "throw". WHERE and WHAT are they used
+            //return false;//putting the return false inside the catch keeps failures handled together
             //IMPROVEMENTS: Enterprise systems often use: Custom Exceptions instead return false (though it is okay to use return false for small/medium apps)
         }
     }
 
     @Override
-    public boolean deleteProduct(int id){
+    public boolean deleteProduct(int id) throws SQLException {
         //Improvements Suggestion Gpt Optional:
         //final String sql //Query should not change
         //logging
-        //Check existence
-        //Validate the action before deleting completely(optional)
         String sql = "DELETE FROM products WHERE id = ?";//REVIEW: if I should add final keyword for this string
         try(Connection con = DBConnection.getConnection();
             PreparedStatement pstmt = con.prepareStatement(sql)){
@@ -122,8 +114,7 @@ public class ProductDAOImpl implements ProductDAO {
             int rowsAffected = pstmt.executeUpdate();
             return rowsAffected > 0;
         }catch(SQLException e){
-            e.printStackTrace();
-            return false;
+            throw new SQLException("Error while accessing product data", e);
         }
     }
 }

@@ -18,28 +18,22 @@ public class ProductService {
     public boolean validateId(int id) {
         return id > 0;
     }
-    public boolean validateName(String name) {
-        return !name.isEmpty();
-    }
-    public boolean validatePrice(BigDecimal price) {
-        return price.compareTo(BigDecimal.ZERO) > 0;
-    }
-    public boolean validateQuantity(int quantity) {
-        return quantity >= 0;
-    }
+    public boolean validateName(String name) { return !name.isEmpty(); }
+    public boolean validatePrice(BigDecimal price) { return price.compareTo(BigDecimal.ZERO) > 0; }
+    public boolean validateQuantity(int quantity) { return quantity >= 0; }
 
     public Product getExistingProduct(int id) throws SQLException{
         try {
             return dao.getProductById(id);
         }catch(SQLException e){
-            throw new SQLException("Database Error", e);
+            throw new SQLException("Database Error in Getting Existing Product", e);
         }
     }
     public List<Product> getAllExistingProducts() throws SQLException{
         try{
             return dao.getAllProducts();
         } catch(SQLException e){
-            throw new SQLException("Database Error in Getting All Existing Product");
+            throw new SQLException("Database Error in Getting All Products", e);
         }
     }
 

@@ -9,8 +9,7 @@ public class ProductInputUI {
     private ProductService productService = new ProductService();
 
     public String readInput(){
-        String input = scan.nextLine().trim();
-        return input.trim();
+        return scan.nextLine().trim();
     }
 
     public BigDecimal parseBigDecimal(String input) throws NumberFormatException {
@@ -29,7 +28,7 @@ public class ProductInputUI {
                 if(!productService.validateId(id)) System.out.println("Zero(0) or Negative are Not a Valid ID");
                 else return id;
             } catch (NumberFormatException e) {
-                System.out.println("Invalid Input");
+                System.out.println("Invalid");
             }
         }while(true);
     }
@@ -42,6 +41,7 @@ public class ProductInputUI {
             else return name;
         }while (true);
     }
+
     public BigDecimal requestValidPrice(){
         do{
             System.out.print("Price: ");
@@ -51,10 +51,11 @@ public class ProductInputUI {
                 if(!productService.validatePrice(price)) System.out.println("Price Must Not Have a Value of Equal or Less Than Zero(0)");
                 else return price;
             } catch (NumberFormatException e) {
-                System.out.println("Invalid Input");
+                System.out.println("Invalid");
             }
         }while(true);
     }
+
     public int requestValidQuantity(){
         do{
             System.out.print("Quantity: ");
@@ -64,7 +65,7 @@ public class ProductInputUI {
                 if(!productService.validateQuantity(quantity)) System.out.println("Quantity Must Not Be Less Than Zero(0)");
                 else return quantity;
             } catch(NumberFormatException e){
-                System.out.println("Invalid Input");
+                System.out.println("Invalid");
             }
         }while(true);
     }

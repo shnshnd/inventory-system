@@ -1,11 +1,13 @@
 package com.shania.ui;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.Scanner;
 
 public class ProductMenuUI {
     private Scanner scan = new Scanner(System.in);
-    private ProductUI productUI = new ProductUI();
+    private ProductInputUI prodInputUI = new ProductInputUI();
+    private ProductUI prodUI = new ProductUI();
 
     public void menuList(){
         System.out.println("* * * MENU * * *");
@@ -35,36 +37,107 @@ public class ProductMenuUI {
     }
 
     public void menuOptions(int action){
-        int id;
-        String name;
-        BigDecimal price;
-        int quantity;
         switch (action){
-            case 1 -> {
-                System.out.println("* * * Create a Product * * *");
-                System.out.println("Enter the Product Details");
-                productUI.requestProductToCreate();
-            }
-            case 2 -> {
-                System.out.println("* * * Product Details * * *");
-                System.out.println("Enter the Product ID You Want to Display");
-                productUI.requestExistingProduct();
-            }
-            case 3 -> {
-                System.out.println("* * * List of Products * * *");
-                productUI.requestAllProducts();
-            }
-            case 4 -> {
-                System.out.println("* * * Update a Product * * *");
-                System.out.println("Enter the Product ID to Update");
-                productUI.requestProductToUpdate();
-            }
-            case 5 -> {
-                System.out.println("* * * Delete a Product * * *");
-                System.out.println("Enter the Product ID to Delete");
-                productUI.requestProductToDelete();
-            }
+            case 1 -> optionCreateProduct();
+            case 2 -> optionViewProduct();
+            case 3 -> optionViewAllProduct();
+            case 4 -> optionUpdateProduct();
+            case 5 -> optionDeleteProduct();
             default -> System.out.println("Not Part of the Menu Options");
         }
     }
+    public void optionCreateProduct(){
+        try{
+            System.out.println("* * * Create a Product * * *");
+            System.out.println("Enter the Product Details");
+            String createName = prodInputUI.requestValidName();
+            BigDecimal createPrice = prodInputUI.requestValidPrice();
+            int createQuantity = prodInputUI.requestValidQuantity();
+            System.out.println("Enter (\"Y\") to Create | Enter Any Character to Exit: ");
+            String create = scan.nextLine().toUpperCase();
+            if (create.equals("Y")) {
+                prodUI.requestProductToCreate(createName, createPrice, createQuantity);
+            } else System.out.println("Stopping...");
+        }catch(SQLException e){
+            System.out.println(e);
+            System.out.println("-");
+            System.out.println(e.getMessage());
+            System.out.println("-");
+            System.out.println(e.getCause());
+        }
+    }
+
+    public void optionViewProduct(){
+        try{
+            System.out.println("* * * Product Details * * *");
+            System.out.println("Enter the Product ID You Want to Display");
+            int id = prodInputUI.requestValidId();
+            prodUI.requestVerifiedProduct(id);
+        }catch(SQLException e){
+
+            System.out.println(e);
+            System.out.println("--");
+            System.out.println(e.getMessage());
+            System.out.println("--");
+            System.out.println(e.getCause());
+        }
+    }
+    public void optionViewAllProduct(){
+        try{
+            System.out.println("* * * List of Products * * *");
+            prodUI.requestAllProducts();
+        }catch(SQLException e){
+            System.out.println(e);
+            System.out.println("---");
+            System.out.println(e.getMessage());
+            System.out.println("---");
+            System.out.println(e.getCause());
+
+        }
+    }
+    public void optionUpdateProduct(){
+        System.out.println("* * * Update a Product * * *");
+        System.out.println("Enter the Product ID to Update");
+        int id = prodInputUI.requestValidId();
+        try{
+            if (prodUI.requestVerifiedProduct(id)) {
+                System.out.println("Update Product Details: ");
+                String updateName = prodInputUI.requestValidName();
+                BigDecimal updatePrice = prodInputUI.requestValidPrice();
+                int updateQuantity = prodInputUI.requestValidQuantity();
+                System.out.println("Enter (\"Y\") to Update | Enter Any Character to Exit: ");
+                String update = scan.nextLine().toUpperCase();
+                if (update.equals("Y")) {
+                    prodUI.requestProductToUpdate(id, updateName, updatePrice, updateQuantity);
+                } else System.out.println("Stopping...");
+            }
+        }catch(SQLException e){
+            System.out.println(e);
+            System.out.println("----");
+            System.out.println(e.getMessage());
+            System.out.println("----");
+            System.out.println(e.getCause());
+        }
+    }
+    public void optionDeleteProduct(){
+        try{
+            System.out.println("* * * Delete a Product * * *");
+            System.out.println("Enter the Product ID to Delete");
+            int id = prodInputUI.requestValidId();
+            if(prodUI.requestVerifiedProduct(id)) {
+                System.out.println("Enter (\"Y\") to Delete | Enter Any Character to Exit: ");
+                String delete = scan.nextLine().toUpperCase();
+                if (delete.equals("Y")) {
+                    prodUI.requestProductToDelete(id);
+                } else System.out.println("Stopping...");
+            }
+        }catch(SQLException e){
+            System.out.println(e);
+            System.out.println("-----");
+            System.out.println(e.getMessage());
+            System.out.println("-----");
+            System.out.println(e.getCause());
+        }
+    }
+
 }
