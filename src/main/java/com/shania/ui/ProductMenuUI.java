@@ -3,26 +3,25 @@ package com.shania.ui;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Scanner;
-
 public class ProductMenuUI {
     private Scanner scan = new Scanner(System.in);
-    private ProductInputUI prodInputUI = new ProductInputUI();
-    private ProductUI prodUI = new ProductUI();
+    private ProductInputUI productInputUI = new ProductInputUI();
+    private ProductUI productUI = new ProductUI();
 
-    public void menuList(){
+    public void displayMenu(){
         System.out.println("* * * MENU * * *");
         System.out.println("1. Create Product \n2. View a Product\n3. View All Products\n4. Update Product\n5. Delete Product\n6. Exit");
     }
     public void startMenu(){
         boolean running = true;
         do {
-            menuList();
+            displayMenu();
             System.out.print("Enter: ");
             String actionInput = scan.nextLine();
             try{
                 int action = Integer.parseInt(actionInput);
                 if (action >= 1 && action <= 5) {
-                    menuOptions(action);
+                    executeMenuOption(action);
                 } else if (action == 6) {
                     System.out.println("Exiting...");
                     running = false;
@@ -36,108 +35,85 @@ public class ProductMenuUI {
         while (running);
     }
 
-    public void menuOptions(int action){
+    public void executeMenuOption(int action){
         switch (action){
-            case 1 -> optionCreateProduct();
-            case 2 -> optionViewProduct();
-            case 3 -> optionViewAllProduct();
-            case 4 -> optionUpdateProduct();
-            case 5 -> optionDeleteProduct();
+            case 1 -> createProduct();
+            case 2 -> viewProduct();
+            case 3 -> viewAllProduct();
+            case 4 -> updateProduct();
+            case 5 -> deleteProduct();
             default -> System.out.println("Not Part of the Menu Options");
         }
     }
-    public void optionCreateProduct(){
+    public void createProduct(){
         try{
             System.out.println("* * * Create a Product * * *");
             System.out.println("Enter the Product Details");
-            String createName = prodInputUI.requestValidName();
-            BigDecimal createPrice = prodInputUI.requestValidPrice();
-            int createQuantity = prodInputUI.requestValidQuantity();
+            String createName = productInputUI.requestValidName();
+            BigDecimal createPrice = productInputUI.requestValidPrice();
+            int createQuantity = productInputUI.requestValidQuantity();
             System.out.println("Enter (\"Y\") to Create | Enter Any Character to Exit: ");
-            String create = scan.nextLine().toUpperCase();
-            if (create.equals("Y")) {
-                prodUI.requestProductToCreate(createName, createPrice, createQuantity);
+            String create = scan.nextLine();
+            if (create.equalsIgnoreCase("Y")) {
+                productUI.createProduct(createName, createPrice, createQuantity);
             } else System.out.println("Stopping...");
         }catch(SQLException e){
-            System.out.println(e);
-            System.out.println("-");
-            System.out.println(e.getMessage());
-            System.out.println("-");
-            System.out.println(e.getCause());
+            System.out.println("Unable to Process Product Creation Request");
         }
     }
 
-    public void optionViewProduct(){
+    public void viewProduct(){
         try{
             System.out.println("* * * Product Details * * *");
             System.out.println("Enter the Product ID You Want to Display");
-            int id = prodInputUI.requestValidId();
-            prodUI.requestVerifiedProduct(id);
+            int id = productInputUI.requestValidId();
+            productUI.displayVerifiedProduct(id);
         }catch(SQLException e){
-
-            System.out.println(e);
-            System.out.println("--");
-            System.out.println(e.getMessage());
-            System.out.println("--");
-            System.out.println(e.getCause());
+            System.out.println("Unable to Retrieve the Product");
         }
     }
-    public void optionViewAllProduct(){
+    public void viewAllProduct(){
         try{
             System.out.println("* * * List of Products * * *");
-            prodUI.requestAllProducts();
+            productUI.displayAllProducts();
         }catch(SQLException e){
-            System.out.println(e);
-            System.out.println("---");
-            System.out.println(e.getMessage());
-            System.out.println("---");
-            System.out.println(e.getCause());
-
+            System.out.println("Unable to Retrieve All Products");
         }
     }
-    public void optionUpdateProduct(){
+    public void updateProduct(){
         System.out.println("* * * Update a Product * * *");
         System.out.println("Enter the Product ID to Update");
-        int id = prodInputUI.requestValidId();
+        int id = productInputUI.requestValidId();
         try{
-            if (prodUI.requestVerifiedProduct(id)) {
+            if (productUI.displayVerifiedProduct(id)) {
                 System.out.println("Update Product Details: ");
-                String updateName = prodInputUI.requestValidName();
-                BigDecimal updatePrice = prodInputUI.requestValidPrice();
-                int updateQuantity = prodInputUI.requestValidQuantity();
+                String updateName = productInputUI.requestValidName();
+                BigDecimal updatePrice = productInputUI.requestValidPrice();
+                int updateQuantity = productInputUI.requestValidQuantity();
                 System.out.println("Enter (\"Y\") to Update | Enter Any Character to Exit: ");
-                String update = scan.nextLine().toUpperCase();
-                if (update.equals("Y")) {
-                    prodUI.requestProductToUpdate(id, updateName, updatePrice, updateQuantity);
+                String update = scan.nextLine();
+                if (update.equalsIgnoreCase("Y")) {
+                    productUI.updateProduct(id, updateName, updatePrice, updateQuantity);
                 } else System.out.println("Stopping...");
             }
         }catch(SQLException e){
-            System.out.println(e);
-            System.out.println("----");
-            System.out.println(e.getMessage());
-            System.out.println("----");
-            System.out.println(e.getCause());
+            System.out.println("Unable to Process Product Update Request");
         }
     }
-    public void optionDeleteProduct(){
+    public void deleteProduct(){
         try{
             System.out.println("* * * Delete a Product * * *");
             System.out.println("Enter the Product ID to Delete");
-            int id = prodInputUI.requestValidId();
-            if(prodUI.requestVerifiedProduct(id)) {
+            int id = productInputUI.requestValidId();
+            if(productUI.displayVerifiedProduct(id)) {
                 System.out.println("Enter (\"Y\") to Delete | Enter Any Character to Exit: ");
-                String delete = scan.nextLine().toUpperCase();
-                if (delete.equals("Y")) {
-                    prodUI.requestProductToDelete(id);
+                String delete = scan.nextLine();
+                if (delete.equalsIgnoreCase("Y")) {
+                    productUI.deleteProduct(id);
                 } else System.out.println("Stopping...");
             }
         }catch(SQLException e){
-            System.out.println(e);
-            System.out.println("-----");
-            System.out.println(e.getMessage());
-            System.out.println("-----");
-            System.out.println(e.getCause());
+            System.out.println("Unable to Process Product Deletion Request");
         }
     }
-
 }

@@ -3,7 +3,6 @@ package com.shania.ui;
 import com.shania.service.ProductService;
 import java.math.BigDecimal;
 import java.util.Scanner;
-
 public class ProductInputUI {
     private Scanner scan = new Scanner(System.in);
     private ProductService productService = new ProductService();
@@ -28,11 +27,10 @@ public class ProductInputUI {
                 if(!productService.validateId(id)) System.out.println("Zero(0) or Negative are Not a Valid ID");
                 else return id;
             } catch (NumberFormatException e) {
-                System.out.println("Invalid");
+                System.out.println("Please Enter a Valid Whole Number");
             }
         }while(true);
     }
-
     public String requestValidName(){
         do {
             System.out.print("Name: ");
@@ -41,7 +39,6 @@ public class ProductInputUI {
             else return name;
         }while (true);
     }
-
     public BigDecimal requestValidPrice(){
         do{
             System.out.print("Price: ");
@@ -51,11 +48,10 @@ public class ProductInputUI {
                 if(!productService.validatePrice(price)) System.out.println("Price Must Not Have a Value of Equal or Less Than Zero(0)");
                 else return price;
             } catch (NumberFormatException e) {
-                System.out.println("Invalid");
+                System.out.println("Please Enter a Valid Number");
             }
         }while(true);
     }
-
     public int requestValidQuantity(){
         do{
             System.out.print("Quantity: ");
@@ -65,7 +61,7 @@ public class ProductInputUI {
                 if(!productService.validateQuantity(quantity)) System.out.println("Quantity Must Not Be Less Than Zero(0)");
                 else return quantity;
             } catch(NumberFormatException e){
-                System.out.println("Invalid");
+                System.out.println("Please Enter a Valid Whole Number");
             }
         }while(true);
     }

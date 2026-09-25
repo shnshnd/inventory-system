@@ -2,13 +2,11 @@ package com.shania.dao;
 
 import com.shania.model.Product;
 import com.shania.util.DBConnection;
-
 import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
 public class ProductDAOImpl implements ProductDAO {
     //IMPROVEMENTS:
     // Proper Error Logging,
@@ -31,16 +29,20 @@ public class ProductDAOImpl implements ProductDAO {
 
     @Override
     public Product getProductById(int id) throws SQLException{
-        String sql = "SELECT id, name, price, stock_quantity, created_at FROM products WHERE id = ?";//using * instead of specifying the columns is said to be not ideal
+        String sql = "SELECT id, name, price, stock_quantity, created_at FROM products WHERE id = ?";
         try(Connection con = DBConnection.getConnection();
             PreparedStatement pstmt = con.prepareStatement(sql)){
             pstmt.setInt(1, id);
             try(ResultSet rs = pstmt.executeQuery()) {
                 //LEARN why the executeQuery() didn't work when I put the searchQuery inside as the argument, then work after I remove it
-                //Ans: because in the prepareStatement(sql) the query is already precompiled and stored
-                //putting the sql as argument for excuteQuery() will only break the parameter binding.
+                //Ans:
+                // PreparedStatement already contains the SQL statement supplied to prepareStatement() (ex. PreparedStatement pstmt = con.prepareStatement(sql))).
+                // After binding the parameters with setXXX(), executeQuery() executes that prepared statement.
+                // The SQL string should not be supplied again.
+                //However, for Statement, it compiles the SQL query every time it runs and for PreparedStatement it compiles the SQL query only once (precompiled).
+
                 if (rs.next()) {
-                    //IMPROVEMENTS: extract mapping into a separate method to make it clean and so it can be re-use for getAllProducts()
+                    //IMPROVEMENTS: extract mapping into a separate method to make it clean and so it can be re-use for getAllProducts() and future possible added feature so the extraction won't be redundant
                     int resultId = rs.getInt("id");
                     String resultName = rs.getString("name");
                     BigDecimal resultPrice = rs.getBigDecimal("price");
@@ -53,7 +55,8 @@ public class ProductDAOImpl implements ProductDAO {
         } catch(SQLException e){
             throw new SQLException("Error while accessing product data", e);
         }
-        return null;//using just null is vulnerable for NullPointerException is what your trying to access turns out null.
+        return null;//Returning null represents that no Product was found.
+        //The caller must check for null before attempting to use the Product object which what actually applied (if(product == null))
     }
 
 
@@ -83,7 +86,7 @@ public class ProductDAOImpl implements ProductDAO {
         return productList;
     }
 
-    @Override //REVIEW: ChatGPT suggestions
+    @Override
     public boolean updateProduct(Product product) throws SQLException {
         String sql = "UPDATE products SET name = ?, price = ?, stock_quantity = ? WHERE id = ?";
         try(Connection con = DBConnection.getConnection();
@@ -96,7 +99,6 @@ public class ProductDAOImpl implements ProductDAO {
             return rowsAffected > 0;
         } catch (SQLException e) {
             throw new SQLException("Error while accessing product data", e);
-            //e.printStackTrace();//throw new RuntimeException(e);//Learn the different exception/errors and the different use of "throw". WHERE and WHAT are they used
             //return false;//putting the return false inside the catch keeps failures handled together
             //IMPROVEMENTS: Enterprise systems often use: Custom Exceptions instead return false (though it is okay to use return false for small/medium apps)
         }
